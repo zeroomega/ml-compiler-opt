@@ -95,6 +95,10 @@ def worker(policy_path: Optional[str],
     key_filter: regex filter for key names to include, or None to include all.
   """
   try:
+    logging.info('policy_path %s', policy_path)
+    logging.info('work_queue %s', work_queue)
+    logging.info('results_queue %s',results_queue)
+    logging.info('key_filter %s', key_filter)
     runner = get_runner()
     m = re.compile(key_filter) if key_filter else None
     policy = policy_saver.Policy.from_filesystem(
@@ -158,9 +162,11 @@ def main(_):
   # other smaller files are processed in parallel
   corpus_elements = cps.sample(k=sampled_modules, sort=True)
 
-  worker_count = (
-      min(os.cpu_count(), _NUM_WORKERS.value)
-      if _NUM_WORKERS.value else os.cpu_count())
+  # debug: set worker to 1.
+  worker_count = 1
+  # worker_count = (
+  #     min(os.cpu_count(), _NUM_WORKERS.value)
+  #     if _NUM_WORKERS.value else os.cpu_count())
 
   tfrecord_context = (
       tf.io.TFRecordWriter(_OUTPUT_PATH.value)
